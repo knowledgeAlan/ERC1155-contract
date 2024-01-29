@@ -9,10 +9,8 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract NFTERC115 is ERC1155, ERC1155Pausable, Ownable, ERC1155Supply {
 
-    uint256 public  publicPrice = 0.00001 ether;
+    uint256 public  publicPrice = 0.001 ether;
     uint256 maxSupply = 1;
-    uint256 public allowListPrice = 0.01 ether;
-    bool public publicMinitOpen = false;
 
     constructor()
         ERC1155("ipfs://Qmaa6TuP2s9pSKczHF4rwWhTKUdygrrDs8RmYYqCjP3Hye/")
@@ -59,17 +57,5 @@ contract NFTERC115 is ERC1155, ERC1155Pausable, Ownable, ERC1155Supply {
         override(ERC1155, ERC1155Pausable, ERC1155Supply)
     {
         super._update(from, to, ids, values);
-    }
-
-    function withdraw(address _addr) external onlyOwner{
-        uint balance = address(this).balance;
-        payable(_addr).transfer(balance);
-    }
-
-    function allowListMint(uint256 id,uint256 amount) public  payable {
-        require(msg.value == allowListPrice * amount);
-        require(totalSupply(id)+ amount <= maxSupply,"Sorry we have mint out!");
-        _mint(msg.sender, id, amount, "");
-
     }
 }

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "ERC1155-contract/NFTERC115.sol",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1706528286413,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1706528286413,
+            "name": "Commit-0",
+            "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport \"@openzeppelin/contracts/token/ERC1155/ERC1155.sol\";\nimport \"@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Pausable.sol\";\nimport \"@openzeppelin/contracts/access/Ownable.sol\";\nimport \"@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol\";\nimport \"@openzeppelin/contracts/utils/Strings.sol\";\n\ncontract NFTERC115 is ERC1155, ERC1155Pausable, Ownable, ERC1155Supply {\n\n    uint256 public  publicPrice = 0.00001 ether;\n    uint256 maxSupply = 1;\n    uint256 public allowListPrice = 0.01 ether;\n    bool public publicMinitOpen = false;\n\n    constructor()\n        ERC1155(\"ipfs://Qmaa6TuP2s9pSKczHF4rwWhTKUdygrrDs8RmYYqCjP3Hye/\")\n        Ownable(msg.sender)\n    {}\n\n    function pause() public onlyOwner {\n        _pause();\n    }\n\n    function unpause() public onlyOwner {\n        _unpause();\n    }\n\n    function mint( uint256 id, uint256 amount)  \n        public\n        payable\n        onlyOwner\n    {\n        require(id < 2,\"Sorry look like you are trying to mint the wrong NFT\");\n        require(msg.value == publicPrice * amount,\"Wrong not enough moeny sent!\");\n\n        require(totalSupply(id) <= maxSupply,\"Sorry we have mint out\");\n        \n        _mint(msg.sender, id, amount, \"\");\n    }\n\n     function uri(uint256 _id) override public view  returns (string memory) {\n        require(exists(_id),\"URI: nonexistent token\");\n        return string(abi.encodePacked(super.uri(_id),Strings.toString(_id),\".jsonn\"));\n    }\n\n    function mintBatch(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)\n        public\n        onlyOwner\n    {\n        _mintBatch(to, ids, amounts, data);\n    }\n\n    // The following functions are overrides required by Solidity.\n\n    function _update(address from, address to, uint256[] memory ids, uint256[] memory values)\n        internal\n        override(ERC1155, ERC1155Pausable, ERC1155Supply)\n    {\n        super._update(from, to, ids, values);\n    }\n\n    function withdraw(address _addr) external onlyOwner{\n        uint balance = address(this).balance;\n        payable(_addr).transfer(balance);\n    }\n\n    function allowListMint(uint256 id,uint256 amount) public  payable {\n        require(msg.value == allowListPrice * amount);\n        require(totalSupply(id)+ amount <= maxSupply,\"Sorry we have mint out!\");\n        _mint(msg.sender, id, amount, \"\");\n\n    }\n}\n"
+        }
+    ]
+}
